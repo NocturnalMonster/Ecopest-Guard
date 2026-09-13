@@ -403,7 +403,10 @@ export default function App() {
 
       {/* Global Footer */}
       <Footer
-        onNavigate={(tab) => setActiveTab(tab)}
+        onNavigate={(tab) => {
+          setActiveTab(tab);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
         onOpenChat={() => setIsLiveChatOpen(true)}
       />
 

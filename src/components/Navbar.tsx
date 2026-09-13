@@ -339,7 +339,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             {[
               { id: 'combos', label: 'Combo Offers' },
               { id: 'blog', label: 'Blog' },
-              { id: 'faq', label: 'FAQ' },
             ].map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -556,7 +555,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           {[
             { id: 'combos', label: 'Combo Offers' },
             { id: 'blog', label: 'Blog & Articles' },
-            { id: 'faq', label: 'FAQ & Support' },
           ].map((tab) => (
             <button
               key={tab.id}

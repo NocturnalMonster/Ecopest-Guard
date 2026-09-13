@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, ArrowRight, Check } from 'lucide-react';
+import { ShieldCheck, ArrowRight, Check, HelpCircle } from 'lucide-react';
 import { ViewTab } from '../types';
 
 interface FooterProps {
@@ -23,9 +23,52 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenChat }) => {
   };
 
   return (
-    <footer className="bg-white text-slate-600 pt-16 pb-12 border-t border-slate-200">
+    <footer className="bg-white text-slate-600 pt-12 pb-12 border-t border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
+        {/* FOOTER FAQ HIGHLIGHT SECTION */}
+        <div className="mb-12 p-6 sm:p-7 rounded-3xl bg-slate-50 border border-slate-200/80 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+            <div>
+              <div className="flex items-center gap-2 text-[#006C49] text-xs font-black uppercase tracking-wider mb-1">
+                <HelpCircle className="w-4 h-4" />
+                <span>Frequently Asked Questions (FAQ)</span>
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-slate-900 font-['Space_Grotesk',sans-serif]">
+                Questions & Answers
+              </h3>
+            </div>
+            <button
+              onClick={() => onNavigate('faq')}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-emerald-50 text-[#006C49] font-bold text-xs border border-emerald-300 transition-colors shadow-2xs self-start sm:self-auto cursor-pointer"
+            >
+              <span>View All Questions</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-5 text-xs">
+            <div className="space-y-1.5">
+              <p className="font-bold text-slate-900">🌿 খাবারের ঘরে বা কিচেনে স্প্রে করা নিরাপদ?</p>
+              <p className="text-slate-500 leading-relaxed">
+                হ্যাঁ, এটি ১০০% প্রাকৃতিক ভেষজ নির্যাস দিয়ে তৈরি। কোনো রাসায়নিক গ্যাস বা বিষাক্ত ফিউম নেই, শিশুদের জন্য নিরাপদ।
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <p className="font-bold text-slate-900">📦 ক্যাশ অন ডেলিভারিতে চেক করে নেওয়া যাবে?</p>
+              <p className="text-slate-500 leading-relaxed">
+                অবশ্যই! রাইডারের সামনে প্যাকেট খুলে ভেতরের বোতলগুলো চেক করে তারপর সম্পূর্ণ মূল্য পরিশোধ করতে পারবেন।
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <p className="font-bold text-slate-900">🛡️ কাজ না করলে কি মানিব্যাক গ্যারান্টি আছে?</p>
+              <p className="text-slate-500 leading-relaxed">
+                হ্যাঁ, ৪ সপ্তাহের মধ্যে কাঙ্ক্ষিত রেজাল্ট না পেলে আমাদের হটলাইনে যোগাযোগ করে ফুল রিফান্ড নিতে পারবেন।
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* TOP ROW: 4 COLUMNS FROM SCREENSHOT */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-slate-200">
           
