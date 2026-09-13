@@ -10,7 +10,8 @@ import {
   Award,
   PawPrint,
   Scissors,
-  Quote
+  Quote,
+  ArrowRight
 } from 'lucide-react';
 import { Product, ProductVariant } from '../types';
 import { PRODUCTS } from '../data/mockData';
@@ -20,6 +21,9 @@ interface CatalogGridProps {
   onQuickAddToCart: (product: Product, variant: ProductVariant) => void;
   onOrderCODDirect?: (product: Product, variant: ProductVariant) => void;
   onViewArticles?: () => void;
+  selectedCategory?: string;
+  onCategoryChange?: (category: string) => void;
+  onNavigateCategoryPage?: (categorySlug: string) => void;
 }
 
 interface DisplaySolution {
@@ -41,20 +45,36 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
   onSelectProduct,
   onQuickAddToCart,
   onOrderCODDirect,
-  onViewArticles
+  onViewArticles,
+  selectedCategory = 'all',
+  onCategoryChange,
+  onNavigateCategoryPage
 }) => {
-  const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>('all');
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>(selectedCategory);
   const [addedMap, setAddedMap] = useState<Record<string, boolean>>({});
+
+  // Sync internal state with external selectedCategory prop
+  React.useEffect(() => {
+    if (selectedCategory) {
+      setActiveCategoryFilter(selectedCategory);
+    }
+  }, [selectedCategory]);
+
+  const handleFilterClick = (tabId: string) => {
+    setActiveCategoryFilter(tabId);
+    onCategoryChange?.(tabId);
+  };
 
   const filterTabs = [
     { id: 'all', label: 'All Products' },
     { id: 'pest', label: 'Pest Control & Prevention' },
     { id: 'kitchen', label: 'Kitchen & Heavy Degreasing' },
     { id: 'leather', label: 'Leather & Interior Shield' },
-    { id: 'concentrate', label: 'Eco-Shield Concentrates' }
+    { id: 'concentrate', label: 'Eco-Shield Concentrates' },
+    { id: 'combos', label: 'Combos & Bundles' }
   ];
 
-  // 4 Featured Solutions matching Screenshot 2 precisely
+  // Featured Solutions matching portfolio categories
   const solutions: DisplaySolution[] = [
     {
       id: 'degreaser-750',
@@ -111,6 +131,20 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
       image: 'https://lh3.googleusercontent.com/aida/AEtjO1XVMNtlUMEjdw2KG6wtEnwMbsDNqFOthrOFKVOPCcf7wTDMXrMUDCmaIbG1Eqqdb8JbONNT-84LvyFaNtS8FlSLp20nifqqRaFZ66B-W5FFfVFdfIocwZAsxsSZi_lxp7SsPP6VJCwyEKwf3Iajg4nQlU0u3u43EmjYtcgTUxbYrTqMJFbzqaGwqmNQLADSkbRzXjmxkFppggjbgaqz2iqFoYZeG_3C6geAH_G7hFE4hNnDmNqF7KdFFOc',
       categoryFilter: 'concentrate',
       mappedProductId: 'termite-injector-kit'
+    },
+    {
+      id: 'kitchen-pest-combo',
+      badge: 'Save 30%',
+      categoryTag: 'FAMILY VALUE COMBO',
+      title: 'Eco Ultra Kitchen + Pest Protection Bundle',
+      rating: 4.9,
+      reviews: '3,120',
+      description: 'Dual-action package containing 450ml Pest Guard plus 500ml Kitchen & Tile Degreaser with free trigger spray.',
+      price: '$39.99',
+      originalPrice: '$55.00',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB36HfOqS6SxdxQV5pnuFiNJOgCkJ_0qvBSbF2b2ZgkA8j73gZWjhJtwZzf2yTaqkXelbOp3UwEGLSSAAphWLgy7mmLcYRkopKWq8fFwSsP9eNgKcyvVvLDq3sal1JaRNYd58O-wHuWPBvl2-JZohNxj3W6XYAePOioig8UPLyKAd6SeutuiWQK767uVjQObN0wC7ckF4jMN57YzTlCtq1WsJJJXRuGo_2xijVDcyIgtKF4LvUlJ1g4wg',
+      categoryFilter: 'combos',
+      mappedProductId: 'kitchen-pest-combo'
     }
   ];
 
@@ -153,23 +187,35 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
           </div>
 
           {/* CATEGORY FILTER PILLS */}
-          <div className="flex flex-wrap items-center gap-2">
-            {filterTabs.map(tab => {
-              const isActive = activeCategoryFilter === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveCategoryFilter(tab.id)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-[#00271B] text-white shadow-xs'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
+          <div className="flex flex-col items-start lg:items-end gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {filterTabs.map(tab => {
+                const isActive = activeCategoryFilter === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => handleFilterClick(tab.id)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-[#00271B] text-white shadow-xs'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {onNavigateCategoryPage && activeCategoryFilter !== 'all' && (
+              <button
+                onClick={() => onNavigateCategoryPage(activeCategoryFilter)}
+                className="text-[11px] font-black text-[#006C49] hover:text-[#00422e] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                <span>Open Dedicated {filterTabs.find(t => t.id === activeCategoryFilter)?.label} Page</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            )}
           </div>
         </div>
 

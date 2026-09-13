@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   ShoppingBag, 
   Search, 
@@ -10,10 +10,83 @@ import {
   Sparkles,
   Zap,
   Clock,
-  ArrowRight
+  ArrowRight,
+  ChevronDown,
+  ChevronRight,
+  Layers,
+  Droplets,
+  Package,
+  Armchair
 } from 'lucide-react';
 import { ViewTab, Product } from '../types';
 import { PRODUCTS } from '../data/mockData';
+
+export interface CategoryMenuItem {
+  id: string;
+  label: string;
+  shortDesc: string;
+  badge?: string;
+  badgeColor?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  itemCount: string;
+}
+
+export const PRODUCT_CATEGORIES: CategoryMenuItem[] = [
+  {
+    id: 'all',
+    label: 'All Products',
+    shortDesc: 'Complete botanical defense & cleaning lineup',
+    badge: 'All',
+    badgeColor: 'bg-slate-100 text-slate-700',
+    icon: Layers,
+    itemCount: '6 Solutions'
+  },
+  {
+    id: 'pest',
+    label: 'Pest Control & Prevention',
+    shortDesc: 'Cockroach, Termite, Bedbug & Ant Eradication',
+    badge: 'Bestseller',
+    badgeColor: 'bg-emerald-100 text-emerald-800',
+    icon: ShieldCheck,
+    itemCount: '2 Formulas'
+  },
+  {
+    id: 'kitchen',
+    label: 'Kitchen & Heavy Degreasing',
+    shortDesc: 'Stovetop, tile & sink enzymatic grease break',
+    badge: 'Fast-Acting',
+    badgeColor: 'bg-amber-100 text-amber-800',
+    icon: Sparkles,
+    itemCount: '1 Formula'
+  },
+  {
+    id: 'leather',
+    label: 'Leather & Interior Shield',
+    shortDesc: 'Deep conditioning & dust mite repellent wax',
+    badge: 'Premium',
+    badgeColor: 'bg-purple-100 text-purple-800',
+    icon: Armchair,
+    itemCount: '1 Formula'
+  },
+  {
+    id: 'concentrate',
+    label: 'Eco-Shield Concentrates',
+    shortDesc: '32x High-dilution & perimeter lawn barriers',
+    badge: 'High Yield',
+    badgeColor: 'bg-blue-100 text-blue-800',
+    icon: Droplets,
+    itemCount: '1 Formula'
+  },
+  {
+    id: 'combos',
+    label: 'Combos & Value Bundles',
+    shortDesc: 'Multi-room packs with up to 30% savings',
+    badge: 'Save 30%',
+    badgeColor: 'bg-rose-100 text-rose-800',
+    icon: Package,
+    itemCount: '2 Bundles'
+  }
+];
 
 interface NavbarProps {
   activeTab: ViewTab;
@@ -23,6 +96,8 @@ interface NavbarProps {
   onSelectProduct: (product: Product) => void;
   onOpenAccount: () => void;
   onOpenSupport: () => void;
+  selectedCategory?: string;
+  onSelectCategory?: (categoryId: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -32,11 +107,58 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCart,
   onSelectProduct,
   onOpenAccount,
-  onOpenSupport
+  onOpenSupport,
+  selectedCategory = 'all',
+  onSelectCategory
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
+  const categoryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const categoryContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        categoryContainerRef.current &&
+        !categoryContainerRef.current.contains(event.target as Node)
+      ) {
+        setCategoryDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (categoryTimeoutRef.current) clearTimeout(categoryTimeoutRef.current);
+    };
+  }, []);
+
+  const handleCategoryHoverEnter = () => {
+    if (categoryTimeoutRef.current) {
+      clearTimeout(categoryTimeoutRef.current);
+    }
+    setCategoryDropdownOpen(true);
+  };
+
+  const handleCategoryHoverLeave = () => {
+    categoryTimeoutRef.current = setTimeout(() => {
+      setCategoryDropdownOpen(false);
+    }, 200);
+  };
+
+  const handleCategorySelect = (categoryId: string) => {
+    if (categoryId === 'all') {
+      setActiveTab('shop');
+    } else {
+      onSelectCategory?.(categoryId);
+      setActiveTab('category');
+    }
+    setCategoryDropdownOpen(false);
+    setMobileMenuOpen(false);
+  };
 
   const searchResults = searchQuery.trim()
     ? PRODUCTS.filter(p => 
@@ -49,6 +171,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const handleNavClick = (tab: ViewTab) => {
     setActiveTab(tab);
     setMobileMenuOpen(false);
+    setCategoryDropdownOpen(false);
   };
 
   return (
@@ -77,9 +200,143 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* CENTER LINKS: EXACT USER NAVIGATION TABS FROM SCREENSHOT */}
           <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+            {/* Home Tab */}
+            <button
+              onClick={() => handleNavClick('home')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs tracking-tight transition-all cursor-pointer ${
+                activeTab === 'home'
+                  ? 'bg-sky-50 text-sky-800 font-extrabold shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 font-semibold hover:bg-slate-100/70'
+              }`}
+            >
+              Home
+            </button>
+
+            {/* Shop Tab (Single page for all products) */}
+            <button
+              onClick={() => handleNavClick('shop')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs tracking-tight transition-all cursor-pointer ${
+                activeTab === 'shop'
+                  ? 'bg-[#00271B] text-white font-extrabold shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 font-semibold hover:bg-slate-100/70'
+              }`}
+            >
+              Shop
+            </button>
+
+            {/* CATEGORY DROPDOWN MENU (HOVER & CLICK TRIGGERED) */}
+            <div
+              ref={categoryContainerRef}
+              className="relative"
+              onMouseEnter={handleCategoryHoverEnter}
+              onMouseLeave={handleCategoryHoverLeave}
+            >
+              <button
+                type="button"
+                onClick={() => setCategoryDropdownOpen(prev => !prev)}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs tracking-tight transition-all cursor-pointer ${
+                  activeTab === 'category' || categoryDropdownOpen
+                    ? 'bg-emerald-50 text-[#006C49] font-extrabold shadow-2xs ring-1 ring-emerald-200'
+                    : 'text-slate-600 hover:text-slate-900 font-semibold hover:bg-slate-100/70'
+                }`}
+                aria-expanded={categoryDropdownOpen}
+                aria-haspopup="true"
+              >
+                <span>Category</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    categoryDropdownOpen ? 'rotate-180 text-[#006C49]' : 'text-slate-400'
+                  }`}
+                />
+              </button>
+
+              {/* DROPDOWN FLYOUT DISPLAYING ALL PRODUCT CATEGORIES */}
+              {categoryDropdownOpen && (
+                <div
+                  className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  onMouseEnter={handleCategoryHoverEnter}
+                  onMouseLeave={handleCategoryHoverLeave}
+                >
+                  <div className="w-[520px] sm:w-[580px] bg-white rounded-2xl shadow-2xl border border-slate-200/90 p-4">
+                    {/* Header */}
+                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[#006C49] animate-pulse" />
+                        <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                          Product Category Pages
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full">
+                        Dedicated Category Hubs
+                      </span>
+                    </div>
+
+                    {/* Category List: 2 Columns */}
+                    <div className="grid grid-cols-2 gap-2">
+                      {PRODUCT_CATEGORIES.map((cat) => {
+                        const isSelected = 
+                          (cat.id === 'all' && activeTab === 'shop') || 
+                          (selectedCategory === cat.id && activeTab === 'category');
+                        const Icon = cat.icon;
+                        return (
+                          <div
+                            key={cat.id}
+                            onClick={() => handleCategorySelect(cat.id)}
+                            className={`group flex items-start gap-3 p-2.5 rounded-xl transition-all cursor-pointer border ${
+                              isSelected
+                                ? 'bg-emerald-50/70 border-emerald-300 shadow-2xs'
+                                : 'bg-white hover:bg-slate-50 border-slate-100 hover:border-slate-200 hover:shadow-2xs'
+                            }`}
+                          >
+                            <div className="w-9 h-9 rounded-xl bg-slate-100 group-hover:bg-[#00271B] group-hover:text-white text-[#006C49] flex items-center justify-center shrink-0 transition-colors">
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-xs font-bold text-slate-900 group-hover:text-[#006C49] transition-colors leading-tight">
+                                  {cat.label}
+                                </span>
+                                {cat.badge && (
+                                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${cat.badgeColor}`}>
+                                    {cat.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
+                                {cat.shortDesc}
+                              </p>
+                              <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 group-hover:text-[#006C49] mt-0.5 transition-colors">
+                                <span>{cat.itemCount}</span>
+                                <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5 text-slate-500 text-[11px]">
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#006C49]" />
+                        <span>All formulas lab-certified & food-prep safe</span>
+                      </div>
+                      <button
+                        onClick={() => handleCategorySelect('all')}
+                        className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-[#006C49] hover:text-[#00422e] font-black text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-emerald-200/60"
+                      >
+                        <Layers className="w-3.5 h-3.5 text-[#006C49]" />
+                        <span>View All Products (Shop Page)</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Remaining Nav Tabs */}
             {[
-              { id: 'home', label: 'Home' },
-              { id: 'shop', label: 'Category' },
               { id: 'combos', label: 'Combo Offers' },
               { id: 'blog', label: 'Blog' },
               { id: 'faq', label: 'FAQ' },
@@ -212,11 +469,93 @@ export const Navbar: React.FC<NavbarProps> = ({
             />
           </div>
 
+          {/* Home */}
+          <button
+            onClick={() => handleNavClick('home')}
+            className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold ${
+              activeTab === 'home'
+                ? 'bg-emerald-50 text-[#006C49]'
+                : 'text-slate-700 hover:bg-slate-50'
+            }`}
+          >
+            Home
+          </button>
+
+          {/* Shop (All Products) */}
+          <button
+            onClick={() => handleNavClick('shop')}
+            className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold ${
+              activeTab === 'shop'
+                ? 'bg-[#00271B] text-white'
+                : 'text-slate-700 hover:bg-slate-50'
+            }`}
+          >
+            Shop (All Products)
+          </button>
+
+          {/* Expandable Category Section */}
+          <div className="rounded-xl border border-slate-200/80 overflow-hidden bg-slate-50/50">
+            <button
+              onClick={() => setMobileCategoryOpen(!mobileCategoryOpen)}
+              className="w-full flex items-center justify-between px-3 py-2.5 text-left text-xs font-bold text-slate-800 hover:bg-slate-100/70"
+            >
+              <div className="flex items-center gap-2">
+                <span>Category</span>
+                <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                  {PRODUCT_CATEGORIES.length} Categories
+                </span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
+                  mobileCategoryOpen ? 'rotate-180 text-[#006C49]' : ''
+                }`}
+              />
+            </button>
+
+            {mobileCategoryOpen && (
+              <div className="bg-white px-2 py-2 space-y-1.5 border-t border-slate-200/80 animate-in slide-in-from-top-1">
+                {PRODUCT_CATEGORIES.map((cat) => {
+                  const Icon = cat.icon;
+                  const isSelected = 
+                    (cat.id === 'all' && activeTab === 'shop') || 
+                    (selectedCategory === cat.id && activeTab === 'category');
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => handleCategorySelect(cat.id)}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl text-left transition-all ${
+                        isSelected
+                          ? 'bg-emerald-50 text-[#006C49] font-black'
+                          : 'hover:bg-slate-50 text-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-7 h-7 rounded-lg bg-slate-100 text-[#006C49] flex items-center justify-center shrink-0">
+                          <Icon className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold truncate">
+                            {cat.id === 'all' ? 'View All Products (Shop Page)' : cat.label}
+                          </p>
+                          <p className="text-[10px] text-slate-500 truncate">{cat.shortDesc}</p>
+                        </div>
+                      </div>
+                      {cat.badge && (
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ml-2 ${cat.badgeColor}`}>
+                          {cat.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Remaining Mobile Tabs */}
           {[
-            { id: 'home', label: 'Home' },
-            { id: 'shop', label: 'Products / Shop' },
-            { id: 'combos', label: 'Combos & Bundles' },
-            { id: 'blog', label: 'Guides & Articles' },
+            { id: 'combos', label: 'Combo Offers' },
+            { id: 'blog', label: 'Blog & Articles' },
             { id: 'faq', label: 'FAQ & Support' },
           ].map((tab) => (
             <button

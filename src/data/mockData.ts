@@ -281,6 +281,56 @@ export const PRODUCTS: Product[] = [
         savingsPercent: 30
       }
     ]
+  },
+  {
+    id: 'eco-perimeter-concentrate',
+    sku: 'US-CON-1000',
+    name: 'UltraShield Bio-Perimeter Concentrate 32x (1 Liter / 1 Gallon)',
+    bengaliSubtitle: 'হাই-কনসেন্ট্রেট বাউন্ডারি স্প্রে • ৩২ গুণ ডাইলুশন সাশ্রয়ী ফর্মুলা',
+    category: 'concentrates',
+    categoryLabel: 'Eco-Shield Concentrates',
+    badge: 'HIGH YIELD',
+    badgeType: 'bio',
+    rating: 4.9,
+    reviewCount: 2450,
+    soldCount: '1,800+ Gallons Deployed',
+    featuredImage: 'https://lh3.googleusercontent.com/aida/AEtjO1XVMNtlUMEjdw2KG6wtEnwMbsDNqFOthrOFKVOPCcf7wTDMXrMUDCmaIbG1Eqqdb8JbONNT-84LvyFaNtS8FlSLp20nifqqRaFZ66B-W5FFfVFdfIocwZAsxsSZi_lxp7SsPP6VJCwyEKwf3Iajg4nQlU0u3u43EmjYtcgTUxbYrTqMJFbzqaGwqmNQLADSkbRzXjmxkFppggjbgaqz2iqFoYZeG_3C6geAH_G7hFE4hNnDmNqF7KdFFOc',
+    galleryImages: [
+      'https://lh3.googleusercontent.com/aida/AEtjO1XVMNtlUMEjdw2KG6wtEnwMbsDNqFOthrOFKVOPCcf7wTDMXrMUDCmaIbG1Eqqdb8JbONNT-84LvyFaNtS8FlSLp20nifqqRaFZ66B-W5FFfVFdfIocwZAsxsSZi_lxp7SsPP6VJCwyEKwf3Iajg4nQlU0u3u43EmjYtcgTUxbYrTqMJFbzqaGwqmNQLADSkbRzXjmxkFppggjbgaqz2iqFoYZeG_3C6geAH_G7hFE4hNnDmNqF7KdFFOc'
+    ],
+    price: 1450,
+    originalPrice: 1950,
+    discountPercent: 25,
+    couponAmount: 150,
+    stockStatus: 'In Stock • Ready for Same-Day Dispatch',
+    dispatchInfo: 'Home Delivery: Dhaka ৳৬০ | Outside Dhaka ৳১২০',
+    description: 'Ultra-concentrated botanical formula yields up to 32 liters of perimeter and garden insect barrier. Ideal for large homes, gardens, warehouses and commercial kitchens.',
+    bulletFeatures: [
+      '32x Dilution Ratio: 1 Liter bottle makes 32 Liters of ready-to-spray perimeter defense.',
+      'Rain-Resistant Polymer: Retains efficacy on exterior concrete, soil borders, and walls for 6 months.',
+      'Massive Cost Savings: Cuts commercial pest control costs by over 70% with non-toxic safety.'
+    ],
+    targetProblems: ['Ticks & Fleas', 'Mosquitoes', 'Outdoor Ants'],
+    formulationType: 'High-Dilution Botanical Concentrate',
+    variants: [
+      {
+        id: 'con-1l',
+        name: '1 Liter Pro Concentrate (Yields 32L)',
+        volume: '1 Liter',
+        price: 1450,
+        originalPrice: 1950,
+        savingsPercent: 25
+      },
+      {
+        id: 'con-gallon',
+        name: '1 Gallon Master Jug (Yields 120L)',
+        volume: '3.78 Liters (1 Gal)',
+        price: 3850,
+        originalPrice: 5200,
+        savingsPercent: 26,
+        popular: true
+      }
+    ]
   }
 ];
 

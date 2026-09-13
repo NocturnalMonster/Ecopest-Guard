@@ -1,4 +1,15 @@
-export type ViewTab = 'home' | 'shop' | 'combos' | 'pdp' | 'blog' | 'article' | 'faq' | 'checkout';
+export type ViewTab = 
+  | 'home' 
+  | 'shop' 
+  | 'category' 
+  | 'combos' 
+  | 'pdp' 
+  | 'blog' 
+  | 'article' 
+  | 'faq' 
+  | 'checkout';
+
+export type CategorySlug = 'pest' | 'kitchen' | 'leather' | 'concentrate' | 'combos' | 'all';
 
 export interface ProductVariant {
   id: string;

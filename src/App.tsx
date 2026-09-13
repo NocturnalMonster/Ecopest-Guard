@@ -3,13 +3,16 @@ import {
   ViewTab, 
   Product, 
   ProductVariant, 
-  CartItem 
+  CartItem,
+  CategorySlug
 } from './types';
 import { PRODUCTS } from './data/mockData';
 import { Navbar } from './components/Navbar';
 import { HeroComparison } from './components/HeroComparison';
 import { AmazonBuyBox } from './components/AmazonBuyBox';
 import { CatalogGrid } from './components/CatalogGrid';
+import { ShopPage } from './components/ShopPage';
+import { CategoryPage } from './components/CategoryPage';
 import { ProductDetailPage } from './components/ProductDetailPage';
 import { BlogHub } from './components/BlogHub';
 import { FAQCenter } from './components/FAQCenter';
@@ -23,6 +26,7 @@ import { ShieldCheck, Truck, CheckCircle2, PhoneCall, ArrowRight, Package } from
 export default function App() {
   // Navigation State
   const [activeTab, setActiveTab] = useState<ViewTab>('home');
+  const [selectedCategory, setSelectedCategory] = useState<CategorySlug>('pest');
   const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[0]);
 
   // Cart State (Initialized with 1 item for immediate demo convenience)
@@ -144,6 +148,19 @@ export default function App() {
     setActiveTab('pdp');
   };
 
+  // Select category from Navbar or Catalog
+  const handleSelectCategory = (categoryId: string) => {
+    if (categoryId === 'all') {
+      setActiveTab('shop');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    const slug = (categoryId as CategorySlug) || 'pest';
+    setSelectedCategory(slug);
+    setActiveTab('category');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Scroll to featured box
   const handleScrollToFeatured = () => {
     const el = document.getElementById('featured-buy-box');
@@ -176,6 +193,8 @@ export default function App() {
         onSelectProduct={handleOpenPDP}
         onOpenAccount={() => setIsAccountOpen(true)}
         onOpenSupport={() => setIsLiveChatOpen(true)}
+        selectedCategory={selectedCategory}
+        onSelectCategory={handleSelectCategory}
       />
 
       {/* Main Content View Container */}
@@ -261,17 +280,45 @@ export default function App() {
               onQuickAddToCart={handleQuickAddToCart}
               onOrderCODDirect={(p, v) => handleBuyNow(p, v, 1, false)}
               onViewArticles={() => setActiveTab('blog')}
+              selectedCategory={selectedCategory}
+              onCategoryChange={(cat) => setSelectedCategory(cat as CategorySlug)}
+              onNavigateCategoryPage={handleSelectCategory}
             />
           </div>
         )}
 
-        {/* VIEW 2: PRODUCTS / SHOP */}
+        {/* VIEW 2: PRODUCTS / SHOP SINGLE PAGE FOR ALL PRODUCTS */}
         {activeTab === 'shop' && (
-          <CatalogGrid
+          <ShopPage
             onSelectProduct={handleOpenPDP}
             onQuickAddToCart={handleQuickAddToCart}
             onOrderCODDirect={(p, v) => handleBuyNow(p, v, 1, false)}
-            onViewArticles={() => setActiveTab('blog')}
+            onNavigateCategoryPage={handleSelectCategory}
+            onNavigateHome={() => setActiveTab('home')}
+          />
+        )}
+
+        {/* VIEW: DEDICATED PRODUCT CATEGORY PAGE */}
+        {activeTab === 'category' && (
+          <CategoryPage
+            categorySlug={selectedCategory}
+            onSelectCategory={(slug) => {
+              if (slug === 'all') {
+                setActiveTab('shop');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+              }
+              setSelectedCategory(slug);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onSelectProduct={handleOpenPDP}
+            onQuickAddToCart={handleQuickAddToCart}
+            onOrderCODDirect={(p, v) => handleBuyNow(p, v, 1, false)}
+            onNavigateHome={() => setActiveTab('home')}
+            onNavigateShop={() => {
+              setActiveTab('shop');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         )}
 
